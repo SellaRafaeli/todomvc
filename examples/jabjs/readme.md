@@ -2,7 +2,7 @@
 
 > Short description of the framework provided by the official website.
 
-> _[JabJS - sellarafaeli.com/jabjs](sellarafaeli.com/jabjs)_
+> _[JabJS - sellarafaeli.com/jabjs](http://www.sellarafaeli.com/jabjs)_
 
 
 ## Learning Framework Name
