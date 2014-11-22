@@ -1,65 +1,66 @@
 (function( window ) {
-	'use strict';
+	
+    app = {
+        
+        addTodo: function(val) { 
+            app.todos.push({name: val, 
+                completed: false,
 
-	// Your starting point. Enjoy the ride!
+                update: function() {
+                    app.calc(); //just counters; model is synced with view. 
+                },
 
-})( window );
+                destroy: function() { 
+                    var name = this.name;
+                    app.todos = app.todos.filter(function(todo) { 
+                        return !(todo.name == name)} 
+                        );
+                },
 
-//modifications to jab:
-// 1. added enter (and might need to refactor the whole 'listener' approach)
-// 2. I hould defend and notify against missing selectors
-// 3. (obj.hasOwnProperty(key)) around objKeysMap
-// 4. modified 'click'
-x =0
-app = {
-    addTodo: function(val) { 
-        app.todos.push({name: val, completed: false});
-        app.calc();
-    },
+                ondblclick: function(elem) {
+                    elem.parentElement.classList.add('editing');
+                },                                
 
-    markAll: function(val) {
+                onblur: function(elem) { 
+                    elem.parentElement.classList.remove('editing');  
+                }
+            }); 
+
+            app.calc();
+        },
+
+        removeCompleted: function() {
+            app.todos = app.todos.filter(function(todo) { return !todo.completed} );
+            app.calc();
+        },
+
+        markAll: function(val) {
         app.lastMarked = !app.lastMarked; //flip each time.
         app.todos.forEach(function(todo) { todo.completed = app.lastMarked });
         app.calc();
     },
 
-    calc: function() {
-        //app.active                           = app.todos.filter(function(todo) { return todo.completed });
-        app.numActive                    = app.todos.filter(function(todo) { return !todo.completed }).length;
-        app.numCompleted             = app.todos.filter(function(todo) { return todo.completed }).length;
-        
-        app.shouldShowClearButton = (app.numCompleted > 0);      
-        app.shouldShowList             = ((app.numActive > 0) || (app.numCompleted > 0));
-        console.log("calcing");
-    },
+        calc: function() {
+            app.numActive                    = app.todos.filter(function(todo) { return !todo.completed }).length;
+            app.numCompleted             = app.todos.filter(function(todo) { return todo.completed }).length;
+            
+            app.shouldShowClearButton = (app.numCompleted > 0);      
+            app.shouldShowFooter             = ((app.numActive > 0) || (app.numCompleted > 0));
+        },
 
-    todos: [],
-    active: [],
-    completed: [],       
-    numActive: 0,
-    numCompleted: 0,
-    showClearButton: false
-};
+        todos: []        
+    };
 
-app.calc();
-// app.numActive = 0;
-// app.numCompleted = 0;
-//jab.bindObj(app, "#todoapp");
+    app.calc(); 
 
-//jab.bind(app, 'addTodo', "#todoapp", 'enter');                        
+    jab.bind(app, 'addTodo', "#new-todo", 'enter');                        
+    jab.bind(app, 'markAll', "#toggle-all", 'check');                        
+    jab.bind(app, 'shouldShowClearButton', "#clear-completed", 'show');
+    jab.bind(app, 'shouldShowFooter', "footer", 'show');
+    jab.bind(app, 'removeCompleted', "#clear-completed", 'click');
 
-jab.bind(app, 'addTodo', "#new-todo", 'enter');                        
-jab.bind(app, 'markAll', "#toggle-all", 'check');                        
-jab.bind(app, 'numActive', "#num-active");
-jab.bind(app, 'numCompleted', "#num-completed");
-jab.bind(app, 'shouldShowClearButton', "#clear-completed", 'show');
-// jab.bind(app, 'shouldShowList', "#main", 'show');
-//jab.bind(app, 'todos', '.todo');
-jab.bindArr(app.todos, '.todo');
+    jab.bind(app, 'numActive', "#num-active");
+    jab.bind(app, 'numCompleted', "#num-completed");
+    jab.bind(app, 'todos', '.todo');
 
-window.onclick = app.calc;
-//jab.bind(app, 'addTodo', "#new-todo", 'enter');                        
-
-// add
-// mark-as-done
-// delete
+})( window );
