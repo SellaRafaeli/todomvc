@@ -12,6 +12,10 @@
         return a.constructor === Array;
     }
 
+    function getAttributesNames(domElem) { 
+        return Array.prototype.slice.call(domElem.attributes).map(function(item) { return item.name });
+    } 
+
     function toArray(itemOrArray) { //
         itemOrArray = itemOrArray || [];
         if (isArray(itemOrArray)) return itemOrArray;
@@ -34,7 +38,9 @@
     }
 
     function descendants(elem) { 
-        return toArr(elem.querySelectorAll("*")); 
+        var res = toArr(elem.querySelectorAll("*"))
+        res.push(elem); 
+        return res;
     }
 
 /* DOM manipulation */
@@ -210,6 +216,28 @@ function bindVar(obj, propsList, cb) {
     propsList.forEach(function(property) { bindVarCore(obj, property, cb) });
 }
 
+function bindCallbacks(obj, elems) {
+    elems.forEach(function (elem) {
+        var attributes = getAttributesNames(elem);
+        attributes.forEach(function(attr) {
+            if (attr.indexOf('jab-') == 0) { //starts with jab-
+                var cbType = attr.substring('jab-'.length); //part after jab-. E.g. "click"
+                var eventName = 'on'+cbType;
+                var cbName  = elem.getAttribute(attr);                
+                elem[eventName] = function() { 
+                    if (obj[cbName]) obj[cbName](elem); 
+                    
+                    else { //immediate, literal callbacks
+                        var parts = cbName.split('-');
+                        if (parts[0] == 'addClass')       elem.classList.add(parts[1]);                        
+                        if (parts[1] == 'removeClass')  elem.classList.removeClass(parts[1]);                         
+                    }
+                }
+            }
+        }); 
+    });
+}
+
 //bind all properties of all descendants of one element, by 'name' (or other) attribute)
 function bindObj(obj, elemOrSelector, domAttrForObjKey) {
     var elem = toArray(toDomElems(elemOrSelector))[0];
@@ -236,17 +264,8 @@ function bindObj(obj, elemOrSelector, domAttrForObjKey) {
     //     objProperty = elem.getAttribute(domAttr);
     //     if (obj[objProperty]) bindModelToElem(obj, objProperty, elem);        
     // });
+    bindCallbacks(obj, elems);
     
-    elems.forEach(function (elem) {
-        var eventType   = elem.getAttribute('jab-on'); //e.g. <span jab-on='click'>
-        var eventName  = 'on'+eventType;
-        var specificHandlerName = elem.getAttribute('jab-'+eventType); // jab-click=...
-        var cbName      = specificHandlerName || elem.getAttribute('jab-do') || eventName;
-        elem[eventName] = function() {             
-            if (obj[cbName]) obj[cbName](elem);    
-        };        
-    });
-
     return obj;
 }
 

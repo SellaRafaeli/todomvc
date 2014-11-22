@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Template • TodoMVC</title>
+		<title>JabJS • TodoMVC</title>
 		<link rel="stylesheet" href="bower_components/todomvc-common/base.css">		
 	</head>
 	<body>
@@ -13,28 +13,28 @@
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section id="main">
-				<input id="toggle-all" type="checkbox">
+				<input id="toggle-all" type="checkbox" jab-click="markAll">
 				<label for="toggle-all">Mark all as complete</label>
 				<ul id="todo-list">					
-					<li class="todo">
-						<div class="view" jab-on="dblclick">
-							<input class="toggle" type="checkbox" name="completed" jab-on="click" jab-do="calc">
+					<li class="todo" name="todos" jab-dblclick="addClass-editing" >
+						<div class="view">
+							<input class="toggle" type="checkbox" name="completed" jab-click="calc" >
 							<label name="name"></label>
-							<button class="destroy" jab-on="click" jab-do="destroy"></button>
+							<button class="destroy" jab-click="destroy"></button>
 						</div>
-						<input class="edit" name="name" jab-on="blur">
+						<input class="edit" name="name" jab-blur="stopEditingMode">
 					</li>
 				</ul>
 			</section>
 			<!-- This footer should hidden by default and shown when there are todos -->
 			<footer id="footer">				
-				<span id="todo-count"><strong id="num-active" name="num-active">1</strong> item left</span>	
+				<span id="todo-count"><strong name="numActive">1</strong> item left</span>	
                                             <!-- <ul id="filters">
                                                 <li><a class="selected" href="#/">All</a></li>
                                                 <li><a href="#/active">Active</a></li>
                                                 <li><a href="#/completed">Completed</a></li>
                                             </ul>		 -->
-				<button id="clear-completed">Clear completed (<span id="num-completed" name="num-completed">1</span>)</button>
+				<button id="clear-completed" jab-click="removeCompleted">Clear completed (<span name="numCompleted">1</span>)</button>
 			</footer>
 		</section>
 		<footer id="info">
