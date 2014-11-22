@@ -92,10 +92,8 @@ function getDomValueProp(elem) {
         switch(opts.func) {
             case 'show': return show;
             case 'bgcolor': return bgcolor;                                
-            case 'disable': return disable;                                
-            case 'click': return click;                                
+            case 'disable': return disable;                                                               
             case 'enter': return enter;
-            case 'check': return check;
         }
     }
 
@@ -111,32 +109,11 @@ function bgcolor(elem, value) {
     elem.style.backgroundColor = value;
 }
 
-function click(elem, value) {
-    elem.addEventListener('click', value);
+function disable(elem, value) {
+    value ? elem.disabled = true : elem.disabled = false;
 }
 
-function check(elem, cb) {    
-    if (elem.listenCheck) return;
-    elem.listenCheck = true; 
-
-    elem.addEventListener('click', function() {
-        cb(elem.checked);
-    });
-}
-
-function doubleClick(elem, cb) {
-    elem.ondblclick = function() {
-        cb(elem.value);
-    };    
-}   
-
-function blur(elem, cb) {
-    elem.onblur = function() {
-        cb(elem.value);
-    };
-}
-
-function enter(elem, cb) {        
+function enter(elem, cb) { //should be refactored into a markupBinding        
     if (elem.listenEnter) return;
     elem.listenEnter = true;
 
@@ -149,9 +126,6 @@ function enter(elem, cb) {
     });    
 }
     
-function disable(elem, value) {
-    value ? elem.disabled = true : elem.disabled = false;
-}
 
 /* JabJS logic */
 function markBindings(obj, property, domElems, opts) {
@@ -216,7 +190,7 @@ function bindVar(obj, propsList, cb) {
     propsList.forEach(function(property) { bindVarCore(obj, property, cb) });
 }
 
-function bindCallbacks(obj, elems) {
+function bindMarkupCallbacks(obj, elems) {
     elems.forEach(function (elem) {
         var attributes = getAttributesNames(elem);
         attributes.forEach(function(attr) {
@@ -259,12 +233,8 @@ function bindObj(obj, elemOrSelector, domAttrForObjKey) {
         var bindedElems = objKeysMap[key]; 
         if (obj.hasOwnProperty(key)) bindModelToElem(obj, key, bindedElems);                
     }
-    //also works instead of using objKeysMap, but incorrectly overrides when binding to more than one elem (since we currently override new jab.binds)
-    // elems.forEach(function (elem) {
-    //     objProperty = elem.getAttribute(domAttr);
-    //     if (obj[objProperty]) bindModelToElem(obj, objProperty, elem);        
-    // });
-    bindCallbacks(obj, elems);
+    
+    bindMarkupCallbacks(obj, elems);
     
     return obj;
 }
@@ -285,7 +255,6 @@ function setArrOnChangesCB(arr, cb) {
         var func = arr[funcName];
         arr[funcName] = function() {
             var res = func.apply(this, arguments);
-            //console.log("invoked "+funcName+"; invoking CB");
             cb(arr);            
             return res;
         }
@@ -299,13 +268,10 @@ function bindArr(arr, elem, domAttr) {
     var elem = toArray(toDomElems(elem))[0]; 
     var papa = elem.parentElement || elem.originalParent;
     //whenever array changes, we want to...
-    var repeatElementByArr = function(newArr) {
-        //debugger
-        //var origElem = elem;
+    var repeatElementByArr = function(newArr) {        
         clearElem(papa);        
-        //elem.parentElement = papa; //keep this for later
         newArr.forEach( function(item, index) {         
-            if (isObj(item)) { //if it's a primitive, it's unclear what/how to bind, since it does not have a father obj. 
+            if (isObj(item)) { //we can't bind primitives. 
                 var newNode = papa.appendChild(elem.cloneNode(true));        
                 jab.bindObj(item, newNode, domAttr);
             }
@@ -334,5 +300,5 @@ window.jab = {
     bindObj: bindObj,
     bindArr: bindArr
 };
-//console.log("loaded JabJS");
+console && console.log("loaded JabJS");
 }());
