@@ -50,9 +50,9 @@
 
     app.count(); //init
     
-    jab.bindObj(app, "#todoapp");                                                        //recursively bind each value with DOM with matching 'name' attr
+    jab.bindObj(app, "#todoapp");  //recursively bind each value with DOM with matching 'name' attr
 
-    jab.bind(app, 'addTodo', "#new-todo", 'enter');                                 //use special 'enter' binding to trigger CB                             
+    jab.bind(app, 'addTodo', "#new-todo", 'enter'); //use special 'enter' binding to trigger CB                             
     jab.bind(app, 'shouldShowClearButton', "#clear-completed", 'show'); //use special 'show' binding to bind truthiness to display
     jab.bind(app, 'shouldShowFooter', "footer", 'show');
     
